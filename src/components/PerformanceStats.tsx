@@ -1,11 +1,18 @@
-import React from 'react';
-import { activeOrderBookState, spread, midPrice, useFullDepth, displayLevelCount, bitMEXWebSocket } from '../store';
-import { useSignals } from '@preact/signals-react/runtime';
+import React from "react";
+import {
+  activeOrderBookState,
+  spread,
+  midPrice,
+  useFullDepth,
+  displayLevelCount,
+  bitMEXWebSocket,
+} from "../store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const PerformanceStats: React.FC = () => {
   // Enable automatic signal tracking for this component
   useSignals();
-  
+
   // Now we can access signal values directly and React will automatically re-render
   const state = activeOrderBookState.value;
   const currentSpread = spread.value;
@@ -14,12 +21,14 @@ export const PerformanceStats: React.FC = () => {
   const currentDisplayLevels = displayLevelCount.value;
 
   const handleToggleDepth = () => {
-    const newMode = fullDepth ? 'L2_25' : 'L2';
+    const newMode = fullDepth ? "L2_25" : "L2";
     useFullDepth.value = !useFullDepth.value;
     bitMEXWebSocket.changeSubscription(newMode);
   };
 
-  const handleDisplayLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDisplayLevelChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     displayLevelCount.value = parseInt(event.target.value, 10);
   };
 
@@ -31,7 +40,9 @@ export const PerformanceStats: React.FC = () => {
       </div>
       <div className="stat-item">
         <div className="stat-label">Total Messages</div>
-        <div className="stat-value">{state.messagesReceived.toLocaleString()}</div>
+        <div className="stat-value">
+          {state.messagesReceived.toLocaleString()}
+        </div>
       </div>
       <div className="stat-item">
         <div className="stat-label">Mid Price</div>
@@ -52,19 +63,19 @@ export const PerformanceStats: React.FC = () => {
       <div className="stat-item">
         <div className="stat-label">Depth Mode</div>
         <div className="stat-value">
-          <button 
+          <button
             onClick={handleToggleDepth}
-            className={`depth-toggle ${!fullDepth ? 'limited' : ''}`}
+            className={`depth-toggle ${!fullDepth ? "limited" : ""}`}
           >
-            {fullDepth ? 'Full (L2)' : 'Top 25 (L2_25)'}
+            {fullDepth ? "Full (L2)" : "Top 25 (L2_25)"}
           </button>
         </div>
       </div>
       <div className="stat-item">
         <div className="stat-label">Display Levels</div>
         <div className="stat-value">
-          <select 
-            value={currentDisplayLevels} 
+          <select
+            value={currentDisplayLevels}
             onChange={handleDisplayLevelChange}
             className="level-select"
           >
