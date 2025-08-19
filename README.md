@@ -2,6 +2,8 @@
 
 A high-performance React application demonstrating real-time order book updates from BitMEX WebSocket API using Signal state management for optimal rendering performance.
 
+🚀 **[Live Demo](https://byshing.github.io/buggy-ws-poc/)** - Try it now!
+
 ## Features
 
 - **Real-time Order Book**: Live XBTUSD order book data from BitMEX WebSocket API
@@ -81,6 +83,18 @@ The application uses Preact Signals for state management, which provides:
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+- `npm run deploy` - Deploy to GitHub Pages (manual)
+
+### Deployment
+
+The application automatically deploys to GitHub Pages via GitHub Actions when pushing to the main/master branch.
+
+For manual deployment:
+```bash
+npm run deploy
+```
+
+The live demo is available at: https://byshing.github.io/buggy-ws-poc/
 
 ## Project Structure
 
