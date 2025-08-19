@@ -323,7 +323,7 @@ class BitMEXWebSocket {
         price: entry.price,
         size: entry.size,
         total: 0,
-        isUpdated: action === 'update' || action === 'insert'
+        isUpdated: true // Always mark new/updated entries as updated
       };
 
       const targetMap = entry.side === 'Buy' ? newBids : newAsks;
@@ -388,6 +388,21 @@ class BitMEXWebSocket {
       }
     });
 
+    // Clear isUpdated flag for all existing entries that weren't just updated
+    if (action !== 'partial') {
+      // Mark all existing entries as not updated
+      newBids.forEach((entry, id) => {
+        if (!data.some(d => d.id === id && d.side === 'Buy')) {
+          newBids.set(id, { ...entry, isUpdated: false });
+        }
+      });
+      newAsks.forEach((entry, id) => {
+        if (!data.some(d => d.id === id && d.side === 'Sell')) {
+          newAsks.set(id, { ...entry, isUpdated: false });
+        }
+      });
+    }
+
     // Log for debugging - temporary
     console.log(`${tableName} ${action}: Before: ${beforeBids} bids, ${beforeAsks} asks | After: ${newBids.size} bids, ${newAsks.size} asks`);
     
@@ -424,26 +439,6 @@ class BitMEXWebSocket {
       asks: newAsks,
       lastUpdateTime: Date.now()
     };
-
-    // Clear update flags after a brief moment
-    setTimeout(() => {
-      const clearedBids = new Map();
-      const clearedAsks = new Map();
-      
-      newBids.forEach((entry: ProcessedOrderBookEntry, id: number) => {
-        clearedBids.set(id, { ...entry, isUpdated: false });
-      });
-      
-      newAsks.forEach((entry: ProcessedOrderBookEntry, id: number) => {
-        clearedAsks.set(id, { ...entry, isUpdated: false });
-      });
-      
-      targetStore.value = {
-        ...targetStore.value,
-        bids: clearedBids,
-        asks: clearedAsks
-      };
-    }, 500);
   }
 
   private attemptReconnect() {
