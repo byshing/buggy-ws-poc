@@ -307,10 +307,6 @@ class BitMEXWebSocket {
     let newBids = new Map(currentState.bids);
     let newAsks = new Map(currentState.asks);
 
-    // Log the state before processing
-    const beforeBids = newBids.size;
-    const beforeAsks = newAsks.size;
-
     // For partial snapshots, clear the maps first
     if (action === 'partial') {
       newBids = new Map();
@@ -363,7 +359,6 @@ class BitMEXWebSocket {
               } else {
                 deletedAsks++;
               }
-              console.log(`Treated size=0 update as delete for ${entry.side} ID ${entry.id}`);
             } else {
               targetMap.set(entry.id, processedEntry);
               if (entry.side === 'Buy') {
@@ -386,8 +381,10 @@ class BitMEXWebSocket {
               deletedAsks++;
             }
           } else {
-            // Log when we try to delete something that doesn't exist
-            console.log(`Trying to delete non-existent ${entry.side} level with ID ${entry.id}, price: ${entry.price}`);
+            // Log when we try to delete something that doesn't exist - keep as warning for debugging purposes
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`Trying to delete non-existent ${entry.side} level with ID ${entry.id}, price: ${entry.price}`);
+            }
           }
           break;
       }
@@ -408,33 +405,9 @@ class BitMEXWebSocket {
       });
     }
 
-    // Log for debugging - temporary
-    console.log(`${tableName} ${action}: Before: ${beforeBids} bids, ${beforeAsks} asks | After: ${newBids.size} bids, ${newAsks.size} asks`);
-    
-    if (action === 'delete') {
-      console.log(`${tableName} delete operation: ${data.length} entries to delete`);
-      console.log(`Successfully deleted: ${deletedBids} bids, ${deletedAsks} asks`);
-      
-      if (deletedBids + deletedAsks < data.length) {
-        console.log(`Delete mismatch! Expected to delete ${data.length}, actually deleted ${deletedBids + deletedAsks}`);
-        // Log the entries that failed to delete
-        data.forEach(entry => {
-          const targetMap = entry.side === 'Buy' ? newBids : newAsks;
-          if (!targetMap.has(entry.id)) {
-            console.log(`Missing entry for deletion: ID ${entry.id}, Side: ${entry.side}, Price: ${entry.price}`);
-          }
-        });
-      }
-    }
-    
-    if (action === 'partial') {
-      console.log(`${tableName} partial snapshot: ${newBids.size} bids, ${newAsks.size} asks`);
-    }
-    
-    // Log when L2_25 exceeds expected limits
-    if (tableName === 'orderBookL2_25' && (newBids.size > 25 || newAsks.size > 25)) {
+    // Log when L2_25 exceeds expected limits - keep for debugging in development
+    if (tableName === 'orderBookL2_25' && (newBids.size > 25 || newAsks.size > 25) && process.env.NODE_ENV === 'development') {
       console.warn(`⚠️ ${tableName} exceeded 25 levels! Bids: ${newBids.size}, Asks: ${newAsks.size}`);
-      console.log(`Last action: ${action}, entries processed: ${data.length}`);
     }
 
     // Update the appropriate signal - this will trigger re-renders

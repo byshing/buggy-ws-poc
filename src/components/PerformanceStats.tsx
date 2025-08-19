@@ -20,7 +20,7 @@ export const PerformanceStats: React.FC = () => {
   };
 
   const handleDisplayLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    displayLevelCount.value = parseInt(event.target.value, 25);
+    displayLevelCount.value = parseInt(event.target.value, 10);
   };
 
   return (
@@ -68,6 +68,7 @@ export const PerformanceStats: React.FC = () => {
             onChange={handleDisplayLevelChange}
             className="level-select"
           >
+            <option value={10}>10</option>
             <option value={25}>25</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
