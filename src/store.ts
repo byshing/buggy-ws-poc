@@ -23,6 +23,9 @@ export const orderBookL2_25State = signal<OrderBookState>({
 // Current active store selector
 export const useFullDepth = signal<boolean>(false); // true = orderBookL2, false = orderBookL2_25
 
+// Display level count setting
+export const displayLevelCount = signal<number>(25); // Default to 25 levels
+
 // Get the currently active order book state
 export const activeOrderBookState = computed(() => {
   return useFullDepth.value ? orderBookL2State.value : orderBookL2_25State.value;
@@ -31,9 +34,10 @@ export const activeOrderBookState = computed(() => {
 // Computed signals for performance - using active store
 export const sortedBids = computed(() => {
   const activeState = activeOrderBookState.value;
+  const levelCount = displayLevelCount.value;
   const bids = Array.from(activeState.bids.values())
     .sort((a: ProcessedOrderBookEntry, b: ProcessedOrderBookEntry) => b.price - a.price)
-    .slice(0, 100); // Limit to top 100 levels
+    .slice(0, levelCount); // Use dynamic level count
   
   // Calculate running totals
   let runningTotal = 0;
@@ -45,9 +49,10 @@ export const sortedBids = computed(() => {
 
 export const sortedAsks = computed(() => {
   const activeState = activeOrderBookState.value;
+  const levelCount = displayLevelCount.value;
   const asks = Array.from(activeState.asks.values())
     .sort((a: ProcessedOrderBookEntry, b: ProcessedOrderBookEntry) => a.price - b.price) // Lowest price first for asks
-    .slice(0, 100); // Limit to top 100 levels
+    .slice(0, levelCount); // Use dynamic level count
   
   // Calculate running totals
   let runningTotal = 0;

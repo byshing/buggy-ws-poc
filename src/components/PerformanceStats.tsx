@@ -1,5 +1,5 @@
 import React from 'react';
-import { activeOrderBookState, spread, midPrice, useFullDepth, bitMEXWebSocket } from '../store';
+import { activeOrderBookState, spread, midPrice, useFullDepth, displayLevelCount, bitMEXWebSocket } from '../store';
 import { useSignals } from '@preact/signals-react/runtime';
 
 export const PerformanceStats: React.FC = () => {
@@ -11,11 +11,16 @@ export const PerformanceStats: React.FC = () => {
   const currentSpread = spread.value;
   const currentMidPrice = midPrice.value;
   const fullDepth = useFullDepth.value;
+  const currentDisplayLevels = displayLevelCount.value;
 
   const handleToggleDepth = () => {
     const newMode = fullDepth ? 'L2_25' : 'L2';
     useFullDepth.value = !useFullDepth.value;
     bitMEXWebSocket.changeSubscription(newMode);
+  };
+
+  const handleDisplayLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    displayLevelCount.value = parseInt(event.target.value, 25);
   };
 
   return (
@@ -53,6 +58,22 @@ export const PerformanceStats: React.FC = () => {
           >
             {fullDepth ? 'Full (L2)' : 'Top 25 (L2_25)'}
           </button>
+        </div>
+      </div>
+      <div className="stat-item">
+        <div className="stat-label">Display Levels</div>
+        <div className="stat-value">
+          <select 
+            value={currentDisplayLevels} 
+            onChange={handleDisplayLevelChange}
+            className="level-select"
+          >
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={200}>200</option>
+            <option value={500}>500</option>
+          </select>
         </div>
       </div>
     </div>

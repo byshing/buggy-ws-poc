@@ -127,6 +127,27 @@ code {
   background: #ff9800;
 }
 
+.level-select {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 60px;
+}
+
+.level-select:hover {
+  background: #444;
+}
+
+.level-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
 /* Order book styles */
 .orderbook-container {
   flex: 1;
